@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * @author Paw
+ * @author Paw, 6runge
  * 
  * Dummy App-Controller for determining the initial project architecture
  *
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @EnableAutoConfiguration
 public class ApplicationController {
+	private static TweetClassifier tc;
 
     @RequestMapping("/sentiments")
     String home(@RequestParam(value = "tweet", defaultValue = "") String tweet, @RequestParam(value = "format", defaultValue = "text") String format) {
@@ -35,12 +36,8 @@ public class ApplicationController {
         out.put("input", input);
 
         JSONArray sentiments = new JSONArray();
-        if (input.contains("shit")) {
-        	sentiments.add("angry");
-        }
-        if (input.contains("haha")) {
-        	sentiments.add("funny");
-        }        
+
+        sentiments.add(tc.classifyTweet(input));
         
         out.put("sentiments", sentiments);
 
@@ -52,12 +49,8 @@ public class ApplicationController {
 
         output.append("input: " + input);
         output.append("\nsentiments:");
-        if (input.contains("shit")) {
-        	output.append("angry ");
-        }
-        if (input.contains("haha")) {
-        	output.append("funny ");
-        }  
+        output.append(tc.classifyTweet(input));
+ 
         return output.toString();
     }
 
@@ -67,6 +60,7 @@ public class ApplicationController {
      * @param args execution arguments
      */
     public static void main(String[] args) {
+    	tc = new TweetClassifier();
         SpringApplication.run(ApplicationController.class, args);
     }
 
