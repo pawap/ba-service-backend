@@ -4,6 +4,9 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -18,17 +21,22 @@ public class ApplicationController {
 	private static TweetClassifier tc;
 
     @RequestMapping("/sentiments")
-    String home(@RequestParam(value = "tweet", defaultValue = "") String tweet, @RequestParam(value = "format", defaultValue = "text") String format) {
+    ResponseEntity<String> home(@RequestParam(value = "tweet", defaultValue = "") String tweet, @RequestParam(value = "format", defaultValue = "text") String format) {
 
         String cleanTweet = tweet.replace("\r", " ").replace("\n", " ").trim();
         System.out.println("tweet:" + cleanTweet);
         String cleanFormat = format.replace("\r", " ").replace("\n", " ").trim();
 
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Access-Control-Allow-Origin", "*");
+        String response;
         if (cleanFormat.compareTo("json") == 0) {
-            return generateJSONResponse(cleanTweet);
+        	response = generateJSONResponse(cleanTweet);
         } else {
-            return generateTextResponse(cleanTweet);
+        	response = generateTextResponse(cleanTweet);
         }
+       
+        return new ResponseEntity<String>(response, responseHeaders,HttpStatus.CREATED);
     }
 
     private String generateJSONResponse(String input) {

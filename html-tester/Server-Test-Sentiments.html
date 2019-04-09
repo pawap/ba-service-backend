@@ -1,19 +1,43 @@
 <!DOCTYPE html>
 <html lang="en" class=" is-copy-enabled">
-  <head>
-    <meta charset='utf-8'>
+<head>
+	<meta charset='utf-8'>
 </head>
 
 <body>
-<form action="http://localhost:8080/sentiments" method="get">
-  Input text: <textarea rows="5" cols="80" name="tweet">
-Tweet
-</textarea>
-<br />
-<select name="format">
-  <option value="text">Text</option>
-  <option value="json">JSON</option>
-</select><input type="submit" value="Analyse">
-</form> 
-
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+	<div id="app">
+  		<div>
+	  		Input text: 
+	  		<textarea v-model="tweet" rows="5" cols="80" name="tweet">
+				Tweet
+			</textarea>
+			<br/>
+			<button v-on:click="analyze">Analyse</button>
+ 		</div>
+		<div v-for="(info,key) in infos.slice().reverse()">
+			<h5>Tweet Nr. {{ infos.length - key }}</h5>
+			<p style="white-space: pre-line;">{{ info.input }}</p>
+			<p v-for="sentiment in info.sentiments">{{ sentiment }}</p>
+			<hr>
+		</div>
+	</div>
+		<script>
+	var vm = new Vue({
+		  el: '#app',
+		  data: {
+			  tweet: 'Tweet',
+			  infos: []
+		  },
+		  // define methods under the `methods` object
+		  methods: {
+		    analyze: function (event) {
+		    	axios
+		    	  .get('http://localhost:8080/sentiments?tweet='+this.tweet+'&format=json')
+		    	  .then(response => (this.infos.push(response.data)))
+		    }
+		  }
+		})	
+	</script>
 </body>
