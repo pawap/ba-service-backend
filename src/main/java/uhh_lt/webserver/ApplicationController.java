@@ -29,6 +29,12 @@ public class ApplicationController {
         }
     }
 
+    @RequestMapping("/hello")
+    String PinkFloyd() {
+
+        return "Is there anybody out there?";
+    }
+    
     private String generateJSONResponse(String input) {
         JSONObject out = new JSONObject();
         out.put("input", input);
@@ -64,4 +70,5 @@ public class ApplicationController {
         SpringApplication.run(ApplicationController.class, args);
     }
 
+    
 }
