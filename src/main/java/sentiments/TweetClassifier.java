@@ -24,7 +24,7 @@ public class TweetClassifier {
 		double classifiedWords = 0;
 		double	sentiment = 0;
 		String classification = "The Tweet is ";
-		String[] tweetWords = tweet.split(" "); 
+		String[] tweetWords = tweet.split("\\s+"); 
 		
 		for (String word : tweetWords) {
 			if (sentiWords.containsKey(word.toUpperCase())) {					

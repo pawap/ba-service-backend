@@ -47,7 +47,7 @@
 		  methods: {
 		    analyze: function (event) {
 		    	axios
-		    	  .get('http://localhost:8080/sentiments?tweet='+this.tweet+'&format=json')
+		    	  .get('http://localhost:8080/sentiments',{params: {tweet: this.tweet, format: "json"}})
 		    	  .then(response => (this.infos.push(response.data)))
 		    }
 		  }
