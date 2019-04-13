@@ -23,12 +23,11 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @EnableAutoConfiguration
-public class ApplicationController {
+public class ApplicationController implements SentimentAnalysisWebInterface{
 	private static TweetClassifier tc;
 
     @RequestMapping("/sentiments")
-    ResponseEntity<String> home(@RequestParam(value = "tweet", defaultValue = "") String tweet, @RequestParam(value = "format", defaultValue = "text") String format) {
-
+	public ResponseEntity<String> home(@RequestParam(value = "tweet", defaultValue = "") String tweet, @RequestParam(value = "format", defaultValue = "text") String format) {
         String cleanTweet = tweet.replace("\r", " ").replace("\n", " ").trim();
         System.out.println("tweet:" + cleanTweet);
         String cleanFormat = format.replace("\r", " ").replace("\n", " ").trim();
@@ -46,7 +45,7 @@ public class ApplicationController {
     }
 
     @RequestMapping("/html")
-    ResponseEntity<String> html() {
+	public ResponseEntity<String> html() {
     	String htmlFile = "html-tester/Server-Test-Sentiments.html";
         BufferedReader br = null;
         String line = "";
@@ -112,5 +111,13 @@ public class ApplicationController {
     	tc = new TweetClassifier();
         SpringApplication.run(ApplicationController.class, args);
     }
+
+	@Override
+	public ResponseEntity<String> offensivityStatistics() {
+        JSONObject response = new JSONObject();
+        response.put("offensive", Math.random() * 100);
+		
+        return new ResponseEntity<String>(response.toString(), HttpStatus.CREATED);
+	}
 
 }
