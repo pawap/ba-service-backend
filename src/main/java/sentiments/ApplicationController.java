@@ -2,6 +2,12 @@ package sentiments;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpHeaders;
@@ -39,6 +45,41 @@ public class ApplicationController {
         return new ResponseEntity<String>(response, responseHeaders,HttpStatus.CREATED);
     }
 
+    @RequestMapping("/html")
+    ResponseEntity<String> html() {
+    	String htmlFile = "html-tester/Server-Test-Sentiments.html";
+        BufferedReader br = null;
+        String line = "";
+        String response = "";
+        try {
+            br = new BufferedReader(new FileReader(htmlFile));
+            while ((line = br.readLine()) != null) {
+            	//System.out.println(line);
+                response += "\n" + line; 
+
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    	
+    	 
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Access-Control-Allow-Origin", "*");
+       
+        return new ResponseEntity<String>(response, responseHeaders,HttpStatus.CREATED);
+    }
+    
     private String generateJSONResponse(String input) {
         JSONObject out = new JSONObject();
         out.put("input", input);
