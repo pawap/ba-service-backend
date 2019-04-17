@@ -14,3 +14,5 @@ def json_to_txt():
 
     # Output: {'name': 'Bob', 'languages': ['English', 'Fench']}
     print(data)
+    
+json_to_txt()
