@@ -6,3 +6,7 @@
 .externalNativeBuild
 /.idea/
 /.idea/misc.xml
+/src/main/resource/application.properties
+/target/
+/bin/
+/.settings/
