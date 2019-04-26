@@ -8,8 +8,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +26,15 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @EnableAutoConfiguration
+@ComponentScan
 public class ApplicationController implements SentimentAnalysisWebInterface{
 	private static TweetClassifier tc;
+
+	@Autowired
+	Environment env;
+	
+	@Autowired
+	BasicDataImporter basicDataImporter;
 
     @RequestMapping("/sentiments")
 	public ResponseEntity<String> home(@RequestParam(value = "tweet", defaultValue = "") String tweet, @RequestParam(value = "format", defaultValue = "text") String format) {
