@@ -18,6 +18,11 @@ It's best to use Maven, though, it'll take care automatically)
 - default port is 8080
 - for deployment, port can be edited in src/main/resources/application.properties (on the server)
 
+### Local Import
+- put an unpacked text file (UTF-8 !!!) containing one json object per line into the directory configured in application.json
+- call the endpoint "/import" (browser or cli)
+- your local db should be filled with a bunch of tweets
+
 ### Check with cURL
 
 - check with "curl localhost:8080/sentiments?tweet=IBM&format=json"
