@@ -82,12 +82,22 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
             }
         }
     	
-    	 
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Access-Control-Allow-Origin", "*");
        
         return new ResponseEntity<String>(response, responseHeaders,HttpStatus.CREATED);
     }
+    
+    @RequestMapping("/import")
+	public ResponseEntity<String> tweetimport() {
+    	
+    	this.basicDataImporter.importFromJson();
+    	
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Access-Control-Allow-Origin", "*");
+       
+        return new ResponseEntity<String>("finished", responseHeaders,HttpStatus.CREATED);
+    }   
     
     private String generateJSONResponse(String input) {
         JSONObject out = new JSONObject();

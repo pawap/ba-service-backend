@@ -1,31 +1,36 @@
 package sentiments;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+/**
+ * @author Paw
+ *
+ */
 @Entity
 public class Tweet {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
+	private Integer uid;
 
 	private String text;
 
-	private Date crdate;
+	private Timestamp crdate;
 
-	private Date tmstamp;
+	private Timestamp tmstamp;
 
-	public Integer getId() {
-		return id;
+	public Integer getUid() {
+		return uid;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setUid(Integer uid) {
+		this.uid = uid;
 	}
 
 	public String getText() {
@@ -36,19 +41,19 @@ public class Tweet {
 		this.text = text;
 	}
 
-	public Date getCrdate() {
+	public Timestamp getCrdate() {
 		return crdate;
 	}
 
-	public void setCrdate(Date crdate) {
+	public void setCrdate(Timestamp crdate) {
 		this.crdate = crdate;
 	}
 
-	public Date getTmstamp() {
+	public Timestamp getTmstamp() {
 		return tmstamp;
 	}
 
-	public void setTmstamp(Date tmstamp) {
+	public void setTmstamp(Timestamp tmstamp) {
 		this.tmstamp = tmstamp;
 	}
 
