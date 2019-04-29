@@ -28,13 +28,15 @@ import org.springframework.web.bind.annotation.*;
 @EnableAutoConfiguration
 @ComponentScan
 public class ApplicationController implements SentimentAnalysisWebInterface{
-	private static TweetClassifier tc;
 
 	@Autowired
 	Environment env;
 	
 	@Autowired
 	BasicDataImporter basicDataImporter;
+	
+	@Autowired
+	W2VTweetClassifier tweetClassifier;
 
     @RequestMapping("/sentiments")
 	public ResponseEntity<String> home(@RequestParam(value = "tweet", defaultValue = "") String tweet, @RequestParam(value = "format", defaultValue = "text") String format) {
@@ -56,6 +58,7 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
 
     @RequestMapping("/html")
 	public ResponseEntity<String> html() {
+    	//tweetClassifier.train();
     	String htmlFile = "html-tester/Server-Test-Sentiments.html";
         BufferedReader br = null;
         String line = "";
@@ -97,7 +100,17 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
         responseHeaders.set("Access-Control-Allow-Origin", "*");
        
         return new ResponseEntity<String>("finished", responseHeaders,HttpStatus.CREATED);
-    }   
+    }
+    
+    @RequestMapping("/import/testandtrain")
+	public ResponseEntity<String> testAndTrainimport() {
+    	
+    	this.basicDataImporter.importTsvTestAndTrain();
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("Access-Control-Allow-Origin", "*");
+       
+        return new ResponseEntity<String>("finished", responseHeaders,HttpStatus.CREATED);
+    }    
     
     private String generateJSONResponse(String input) {
         JSONObject out = new JSONObject();
@@ -105,7 +118,7 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
 
         JSONArray sentiments = new JSONArray();
 
-        sentiments.add(tc.classifyTweet(input));
+        sentiments.add(tweetClassifier.classifyTweet(input));
         
         out.put("sentiments", sentiments);
 
@@ -117,7 +130,7 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
 
         output.append("input: " + input);
         output.append("\nsentiments:");
-        output.append(tc.classifyTweet(input));
+        output.append(tweetClassifier.classifyTweet(input));
  
         return output.toString();
     }
@@ -128,7 +141,6 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
      * @param args execution arguments
      */
     public static void main(String[] args) {
-    	tc = new TweetClassifier();
         SpringApplication.run(ApplicationController.class, args);
     }
 
