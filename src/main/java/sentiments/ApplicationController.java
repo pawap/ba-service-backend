@@ -56,7 +56,7 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
 
     @RequestMapping("/html")
 	public ResponseEntity<String> html() {
-    	String htmlFile = "html-tester/Server-Test-Sentiments.html";
+    	String htmlFile = "html-tester/Sentiments-Frontend (Prototype).html";
         BufferedReader br = null;
         String line = "";
         String response = "";
