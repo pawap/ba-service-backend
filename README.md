@@ -29,6 +29,6 @@ It's best to use Maven, though, it'll take care automatically)
 - for textual output: "curl localhost:8080/sentiments?tweet=IBM&format=text"
 
 ### Check using html-tester
-- URL: "localhost:8081/html"
+- URL: "localhost:8080/html"
 
 
