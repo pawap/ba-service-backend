@@ -17,5 +17,12 @@ public interface BasicDataHandlerInterface {
 	 * @return Structure is subject to discussion.
 	 */
 	public JSONObject getStatistics();
+
+	/**
+	 * raw entry point for FE-Team.
+	 *
+	 * @return Structure is subject to discussion.
+	 */
+	public JSONObject getLabledTweets(Integer iTime, String sLable);
 	
 }
