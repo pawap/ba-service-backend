@@ -9,6 +9,9 @@
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 		<!--Chart.js import-->
 		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<!--Twitter import-->
+		<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 		<script>
 			window.addEventListener('load', function(){
 				//Vue.js element
@@ -17,9 +20,13 @@
 					data: function(){
 						return{
 							//counter number of offensive tweets
-							offensive: 10,
+							offensive: 	axios
+					    	  .get('http://localhost:8080/stats',{params: {offensive: 1}})
+					    	  .then(response => (this.offensive = (response.data.count))),
 							//counter number of offensive tweets
-							nonOffensive: 10,
+							nonOffensive:	axios
+					    	  .get('http://localhost:8080/stats',{params: {offensive: 0}})
+					    	  .then(response => (this.nonOffensive = response.data.count)),
 							//bar chart time selection value
 							selectBarTime: '',
 							//bar chart time selection value
@@ -37,8 +44,6 @@
 						updateCharts: function(){
 							barChart.data.datasets[0].data = [vue.offensive, vue.nonOffensive, vue.offensive+vue.nonOffensive]
 							barChart.update()
-							lineChart.data.datasets[0].data[lineChart.data.datasets[0].data.length-1] = [vue.offensive]
-							lineChart.data.datasets[1].data[lineChart.data.datasets[1].data.length-1] = [vue.nonOffensive]
 							lineChart.update()
 						},
 						//handle the counter inputs
@@ -115,14 +120,14 @@
 						backgroundColor: 'rgb(255, 99, 132)',
 						borderColor: 'rgb(255, 99, 132)',
 						fill: false,
-						data: [3, 7, 10, 10]
+						data: []
 					},
 					{
 						label: 'Anzahl non-offensive Tweets',
 						backgroundColor: 'rgb(0, 255, 0)',
 						borderColor: 'rgb(0, 255, 0)',
 						fill: false,
-						data: [2, 5, 8, 10]
+						data: []
 					},
 				]
 				},
@@ -143,6 +148,21 @@
 					}
 				}
 				});
+				for (let i = 0; i < lineChart.data.labels.length; i++) {
+					axios
+			    	  .get('http://localhost:8080/stats',{params: {offensive: 1, startdate:"2019-05-" + (10+i),  enddate:"2019-05-" + (11+i)}})
+			    	  .then(response => (lineChart.data.datasets[0].data[i] = response.data.count));
+					axios
+			    	  .get('http://localhost:8080/stats',{params: {offensive: 0, startdate:"2019-05-" + (10+i),  enddate:"2019-05-" + (11+i)}})
+			    	  .then(response => (lineChart.data.datasets[1].data[i] = response.data.count));
+				}
+				axios
+					.get('http://localhost:8080/tweet', {params: {offensive: 1}})
+					.then(response => (document.getElementById("offTweet").innerHTML = response.data.html, twttr.widgets.load()));
+				setTimeout(function(){
+					lineChart.update();
+					console.log('update');
+				},1000);
 			})
 		</script>
 	</head>
@@ -154,6 +174,8 @@
 
 		.border-box{
 			border: 1px solid rgb(0, 0, 0);
+			border-radius: 3%;
+
 		}
 
 		.number-text{
@@ -181,10 +203,10 @@
 							<span class="comment">//These counters are just for showing purposes. They will be removed, after connection to real data is established</span>
 							<br>
 							Anzahl offensive Tweets:
-							<input v-model.number="offensive" type="number" class="number-text" @change='handleInput()'>
+							<input v-model.number="offensive" type="number" class="number-text" @input='handleInput()'>
 							<br>
 							Anzahl non-offensive Tweets:
-							<input v-model.number="nonOffensive" type="number" class="number-text" @change='handleInput()'>
+							<input v-model.number="nonOffensive" type="number" class="number-text" @input='handleInput()'>
 					</div>
 				</div>
 			</div>
@@ -226,13 +248,13 @@
 				<div class="col-sm-6">
 					<div class="border-box">
 							<p>Zufälliger als offensive eingestufter Tweet:</p>		
-							<span class="comment">//Should display a random tweet, which was classified as offensive here</span>
+							<div id=offTweet></div>
 					</div>
 				</div>
 				<div class="col-sm-6">
 						<div class="border-box">
 								<p>Zufälliger als non-offensive eingestufter Tweet:</p>
-								<span class="comment">//Should display a random tweet, which was classified as non-offensive here</span>
+								<div id=nonOffTweet></div>
 						</div>
 					</div>
 			</div>			

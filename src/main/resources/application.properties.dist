@@ -11,4 +11,4 @@ spring.datasource.validationQuery = SELECT 1
 spring.datasource.max-active = 15
 spring.datasource.max-idle = 10
 spring.datasource.max-wait = 8000
-localTweetJson = /resources/tweets.json
+localTweetJson = resources/tweet.json

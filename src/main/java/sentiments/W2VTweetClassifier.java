@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
 public class W2VTweetClassifier {
 	
 	@Autowired
-	TweetRepository tweetRepository;
+	TrainingTweetRepository tweetRepository;
 	
 	private MultiLayerNetwork net;
 	

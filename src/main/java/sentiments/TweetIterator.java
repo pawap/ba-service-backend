@@ -44,13 +44,11 @@ public class TweetIterator implements DataSetIterator{
      * @param truncateLength If reviews exceed
      * @param train If true: return the training data. If false: return the testing data.
      */
-    public TweetIterator(TweetRepository tweetRepository, WordVectors wordVectors, int batchSize, int truncateLength, boolean train) {
+    public TweetIterator(TrainingTweetRepository tweetRepository, WordVectors wordVectors, int batchSize, int truncateLength, boolean test) {
         this.batchSize = batchSize;
         this.vectorSize = wordVectors.getWordVector(wordVectors.vocab().wordAtIndex(0)).length;
         this.tweetRepository = tweetRepository;
-        this.offensiveTweets = tweetRepository.findAllByTrainAndOffensive(train,true).iterator();
-        this.nonoffensiveTweets = tweetRepository.findAllByTrainAndOffensive(train,false).iterator();
-        this.totalExamples = (int) tweetRepository.count(train);
+        this.reset();
         this.wordVectors = wordVectors;
         this.truncateLength = truncateLength;
         this.train = train;
@@ -170,9 +168,9 @@ public class TweetIterator implements DataSetIterator{
     @Override
     public void reset() {
         cursor = 0;
-        this.offensiveTweets = tweetRepository.findAllByTrainAndOffensive(train,true).iterator();
-       	this.nonoffensiveTweets = tweetRepository.findAllByTrainAndOffensive(train,false).iterator();
-        this.totalExamples = (int) tweetRepository.count(train);
+        this.offensiveTweets = tweetRepository.findAllByOffensive(true).iterator();
+       	this.nonoffensiveTweets = tweetRepository.findAllByOffensive(false).iterator();
+        this.totalExamples = (int) tweetRepository.count();
     }
 
     public boolean resetSupported() {
