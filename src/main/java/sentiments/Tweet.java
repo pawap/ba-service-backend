@@ -21,6 +21,8 @@ public class Tweet {
 
 	private String text;
 
+	private String language;
+
 	private Timestamp crdate;
 
 	private Timestamp tmstamp;
@@ -40,6 +42,10 @@ public class Tweet {
 	public void setText(String text) {
 		this.text = text;
 	}
+
+	public String getLanguage() { return language; }
+
+	public void setLanguage(String language) { this.language = language;}
 
 	public Timestamp getCrdate() {
 		return crdate;
