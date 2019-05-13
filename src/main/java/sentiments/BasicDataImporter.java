@@ -99,7 +99,7 @@ public class BasicDataImporter {
 		Tweet tweet = new Tweet();
 		if (object.has("text")) {
 			tweet.setText(object.get("text").getAsString());
-			LanguageIdentifier identifier = new LanguageIdentifier("this is english ");
+			LanguageIdentifier identifier = new LanguageIdentifier(tweet.getText());
 			tweet.setLanguage(identifier.getLanguage());
 		}
 		if (object.has("created_at")) {
