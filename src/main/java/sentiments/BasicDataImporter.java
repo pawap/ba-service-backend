@@ -99,7 +99,7 @@ public class BasicDataImporter {
 		Tweet tweet = new Tweet();
 		if (object.has("text")) {
 			tweet.setText(object.get("text").getAsString());
-			LanguageIdentifier identifier = new LanguageIdentifier(tweet.getText().replaceAll("(RT )?@[\\w_-]+[:]?",""));
+			LanguageIdentifier identifier = new LanguageIdentifier(tweet.getText().replaceAll("(((RT )?@[\\w_-]+[:]?)|((https?:\\/\\/)[\\w\\d.-\\/]*))",""));
 			tweet.setLanguage(identifier.getLanguage());
 		}
 		if (object.has("created_at")) {
