@@ -29,6 +29,8 @@ import com.joestelmach.natty.Parser;
 import org.apache.tika.langdetect.OptimaizeLangDetector;
 import org.apache.tika.language.detect.LanguageDetector;
 import org.apache.tika.language.detect.LanguageResult;
+import org.apache.tika.language.LanguageIdentifier;
+
 
 /**
  * @author Paw
@@ -97,9 +99,8 @@ public class BasicDataImporter {
 		Tweet tweet = new Tweet();
 		if (object.has("text")) {
 			tweet.setText(object.get("text").getAsString());
-			LanguageDetector langDetector = new OptimaizeLangDetector().loadModels();
-			LanguageResult langResult = langDetector.detect("hello my name is marc and I want to welcome you here my love");
-			tweet.setLanguage(langResult.getLanguage());
+			LanguageIdentifier identifier = new LanguageIdentifier("this is english ");
+			tweet.setLanguage(identifier.getLanguage());
 		}
 		if (object.has("created_at")) {
 			LocalDateTime dateTime;
