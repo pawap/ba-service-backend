@@ -26,10 +26,11 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.joestelmach.natty.DateGroup;
 import com.joestelmach.natty.Parser;
-import org.apache.tika.langdetect.OptimaizeLangDetector;
-import org.apache.tika.language.detect.LanguageDetector;
-import org.apache.tika.language.detect.LanguageResult;
-import org.apache.tika.language.LanguageIdentifier;
+//import org.apache.tika.langdetect.OptimaizeLangDetector;
+//import org.apache.tika.langdetect.TextLangDetector;
+//import org.apache.tika.language.detect.LanguageDetector;
+//import org.apache.tika.language.detect.LanguageResult;
+//import org.apache.tika.language.LanguageIdentifier;
 
 
 /**
@@ -95,12 +96,18 @@ public class BasicDataImporter {
 		}	
 	}
 
-	private Tweet mapJsonToTweet(JsonObject object) {
+	private Tweet mapJsonToTweet(JsonObject object) throws IOException {
 		Tweet tweet = new Tweet();
 		if (object.has("text")) {
 			tweet.setText(object.get("text").getAsString());
-			LanguageIdentifier identifier = new LanguageIdentifier(tweet.getText().replaceAll("(((RT )?@[\\w_-]+[:]?)|((https?:\\/\\/)[\\w\\d.-\\/]*))",""));
-			tweet.setLanguage(identifier.getLanguage());
+			LanguageDetector detector = new OptimaizeLangDetector().loadModels();
+			String text = tweet.getText().replaceAll("(((RT )?@[\\w_-]+[:]?)|((https?:\\/\\/)[\\w\\d.-\\/]*))","");
+			LanguageResult result = detector.detect(text);
+			//List result = detector.detectAll();
+			//tweet.setLanguage(result.get(0).toString());
+			tweet.setLanguage(result.getLanguage());
+			//LanguageIdentifier identifier = new LanguageIdentifier(tweet.getText().replaceAll("(((RT )?@[\\w_-]+[:]?)|((https?:\\/\\/)[\\w\\d.-\\/]*))",""));
+			//tweet.setLanguage(identifier.getLanguage());
 		}
 		if (object.has("created_at")) {
 			LocalDateTime dateTime;
