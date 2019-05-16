@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
  * Dummy App-Controller for determining the initial project architecture
  *
  */
+
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
