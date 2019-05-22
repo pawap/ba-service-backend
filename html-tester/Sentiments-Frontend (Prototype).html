@@ -26,10 +26,10 @@
 							selectLineTime: '',
 							//time selection values
 							times: [
-								{text: "Letzter Tag", value: "day"}, 
-								{text: "Letzte Woche", value: "week"}, 
-								{text: "Letzter Monat", value: "month"}, 
-							]	
+								{text: "Letzter Tag", value: "day"},
+								{text: "Letzte Woche", value: "week"},
+								{text: "Letzter Monat", value: "month"},
+							]
 						}
 					},
 					methods:{
@@ -162,7 +162,17 @@
 		}
 
 		.comment{
-			color: rgb(68, 68, 68);
+			color: rgb(68,68,68);
+			font-style: italic
+		}
+
+		.comment-offensive{
+			color: rgb(220,20,60);
+			font-style: italic
+		}
+
+		.comment-nonOffensive{
+			color: rgb(0, 255, 64);
 			font-style: italic
 		}
 
@@ -216,7 +226,7 @@
 									<option v-for="time in times" v-bind:value="time.value">
 											{{ time.text }}
 									</option>
-							</select>	
+							</select>
 						</p>
 						<canvas id="lineChart"></canvas>
 					</div>
@@ -225,18 +235,22 @@
 			<div class="row margin-buffer">
 				<div class="col-sm-6">
 					<div class="border-box">
-							<p>Zufälliger als offensive eingestufter Tweet:</p>		
-							<span class="comment">//Should display a random tweet, which was classified as offensive here</span>
+							<p>Zufälliger als offensive eingestufter Tweet:</p>
+							<span class="comment-offensive">//Should display a random tweet, which was classified as offensive here</span>
 					</div>
+							<br>
+						  <button> Ich will ein anderes Kommentar! </button>
 				</div>
 				<div class="col-sm-6">
 						<div class="border-box">
 								<p>Zufälliger als non-offensive eingestufter Tweet:</p>
-								<span class="comment">//Should display a random tweet, which was classified as non-offensive here</span>
+								<span class="comment-nonOffensive">//Should display a random tweet, which was classified as non-offensive here</span>
 						</div>
+						<br>
+						<button> Ich will ein anderes Kommentar! </button>
 					</div>
-			</div>			
-		</div>	
+			</div>
+		</div>
 		<!--Bootstrap imports-->
 		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
