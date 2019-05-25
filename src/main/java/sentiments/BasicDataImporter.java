@@ -26,11 +26,11 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.joestelmach.natty.DateGroup;
 import com.joestelmach.natty.Parser;
-//import org.apache.tika.langdetect.OptimaizeLangDetector;
-//import org.apache.tika.langdetect.TextLangDetector;
-//import org.apache.tika.language.detect.LanguageDetector;
-//import org.apache.tika.language.detect.LanguageResult;
-//import org.apache.tika.language.LanguageIdentifier;
+
+import com.github.pemistahl.lingua.api.LanguageDetectorBuilder;
+import com.github.pemistahl.lingua.api.LanguageDetector;
+import com.github.pemistahl.lingua.api.Language;
+
 
 
 /**
@@ -49,6 +49,9 @@ public class BasicDataImporter {
 	public BasicDataImporter() {
 		super();
 	}
+
+	final LanguageDetector detector = LanguageDetectorBuilder.fromAllBuiltInSpokenLanguages().build();
+
 
 	public void importFromJson() {
 		String jsonPath = this.env.getProperty("localTweetJson");
@@ -100,14 +103,8 @@ public class BasicDataImporter {
 		Tweet tweet = new Tweet();
 		if (object.has("text")) {
 			tweet.setText(object.get("text").getAsString());
-			LanguageDetector detector = new OptimaizeLangDetector().loadModels();
-			String text = tweet.getText().replaceAll("(((RT )?@[\\w_-]+[:]?)|((https?:\\/\\/)[\\w\\d.-\\/]*))","");
-			LanguageResult result = detector.detect(text);
-			//List result = detector.detectAll();
-			//tweet.setLanguage(result.get(0).toString());
-			tweet.setLanguage(result.getLanguage());
-			//LanguageIdentifier identifier = new LanguageIdentifier(tweet.getText().replaceAll("(((RT )?@[\\w_-]+[:]?)|((https?:\\/\\/)[\\w\\d.-\\/]*))",""));
-			//tweet.setLanguage(identifier.getLanguage());
+			final Language detectedLanguage = detector.detectLanguageOf(tweet.getText().replaceAll("(((RT )?@[\\w_-]+[:]?)|((https?:\\/\\/)[\\w\\d.-\\/]*))",""));
+			tweet.setLanguage(detectedLanguage.getIsoCode());
 		}
 		if (object.has("created_at")) {
 			LocalDateTime dateTime;
