@@ -1,7 +1,8 @@
 package sentiments;
 
-import org.springframework.data.repository.CrudRepository;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface TweetRepository extends CrudRepository<Tweet, Integer> {
+public interface TweetRepository extends MongoRepository<Tweet, Integer> {
 
 }
