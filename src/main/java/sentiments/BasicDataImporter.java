@@ -38,7 +38,7 @@ public class BasicDataImporter {
 	Environment env;
 	
 	@Autowired
-	TweetRepository tweetRepository; 
+	TweetRepository tweetRepository;
 	
 	public BasicDataImporter() {
 		super();
@@ -72,11 +72,11 @@ public class BasicDataImporter {
 	        	}
 	        	// persist tweets in batch (256 per insert)
 	        	if (i % 256 == 0) {
-	        		this.tweetRepository.save(tweets);
+	        		this.tweetRepository.saveAll(tweets);
 	        		tweets.clear();
 	        	} 
 	        }
-	        this.tweetRepository.save(tweets);
+	        this.tweetRepository.saveAll(tweets);
 	        reader.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

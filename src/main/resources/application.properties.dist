@@ -12,3 +12,11 @@ spring.datasource.max-active = 15
 spring.datasource.max-idle = 10
 spring.datasource.max-wait = 8000
 localTweetJson = /resources/tweets.json
+
+#MongoConfig
+
+spring.data.mongodb.host=localhost
+spring.data.mongodb.port=27017
+spring.data.mongodb.database=test
+spring.data.mongodb.repositories.enable=true
+
