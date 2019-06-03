@@ -13,21 +13,27 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.apache.commons.io.FileUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,10 +43,11 @@ import org.springframework.web.bind.annotation.*;
  * Dummy App-Controller for determining the initial project architecture
  *
  */
+@Configuration
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-public class ApplicationController implements SentimentAnalysisWebInterface{
+public class ApplicationController extends SpringBootServletInitializer implements SentimentAnalysisWebInterface{
 
 	@Autowired
 	Environment env;
@@ -62,7 +69,7 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
 
         String base_url = "https://publish.twitter.com/oembed?url=https://twitter.com/user/status/";
 
-        String url = base_url + "1075470258964701189" + "&align=center";
+        String url = base_url + "911789314169823232" + "&align=center";
         StringBuffer response = new StringBuffer();
         JsonObject obj = null;
 
@@ -131,35 +138,19 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
         return new ResponseEntity<String>(out.toString(), responseHeaders,HttpStatus.CREATED);
     }    
 
-    @RequestMapping("/html")
+    @RequestMapping("/")
 	public ResponseEntity<String> html() {
-    	//tweetClassifier.train();
-    	String htmlFile = "html-tester/Sentiments-Frontend (Prototype).html";
-        BufferedReader br = null;
-        String line = "";
         String response = "";
         try {
-            br = new BufferedReader(new FileReader(htmlFile));
-            while ((line = br.readLine()) != null) {
-            	//System.out.println(line);
-                response += "\n" + line; 
-
-            }
-
+            File file = ResourceUtils.getFile(
+                    "classpath:html-tester/Sentiments-Frontend.html");
+            response = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
-    	
+
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("Access-Control-Allow-Origin", "*");
        

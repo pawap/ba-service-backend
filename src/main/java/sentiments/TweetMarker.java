@@ -2,6 +2,6 @@ package sentiments;
 
 public interface TweetMarker {
 
-	void mark(Tweet tweet);
+	void mark(AbstractTweet tweet);
 
 }

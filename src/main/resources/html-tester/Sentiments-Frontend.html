@@ -21,11 +21,11 @@
 						return{
 							//counter number of offensive tweets
 							offensive: 	axios
-					    	  .get('/stats',{params: {offensive: 1}})
+					    	  .get('/sentiment19/stats',{params: {offensive: 1}})
 					    	  .then(response => (this.offensive = (response.data.count))),
 							//counter number of offensive tweets
 							nonOffensive:	axios
-					    	  .get('/stats',{params: {offensive: 0}})
+					    	  .get('/sentiment19/															stats',{params: {offensive: 0}})
 					    	  .then(response => (this.nonOffensive = response.data.count)),
 							//bar chart time selection value
 							selectBarTime: '',
@@ -150,14 +150,14 @@
 				});
 				for (let i = 0; i < lineChart.data.labels.length; i++) {
 					axios
-			    	  .get('/stats',{params: {offensive: 1, startdate:"2019-05-" + (10+i),  enddate:"2019-05-" + (11+i)}})
+			    	  .get('/sentiment19/stats',{params: {offensive: 1, startdate:"2019-05-" + (10+i),  enddate:"2019-05-" + (11+i)}})
 			    	  .then(response => (lineChart.data.datasets[0].data[i] = response.data.count));
 					axios
-			    	  .get('/stats',{params: {offensive: 0, startdate:"2019-05-" + (10+i),  enddate:"2019-05-" + (11+i)}})
+			    	  .get('/sentiment19/stats',{params: {offensive: 0, startdate:"2019-05-" + (10+i),  enddate:"2019-05-" + (11+i)}})
 			    	  .then(response => (lineChart.data.datasets[1].data[i] = response.data.count));
 				}
 				axios
-					.get('/tweet', {params: {offensive: 1}})
+					.get('/sentiment19/tweet', {params: {offensive: 1}})
 					.then(response => (document.getElementById("offTweet").innerHTML = response.data.html, twttr.widgets.load()));
 				setTimeout(function(){
 					lineChart.update();

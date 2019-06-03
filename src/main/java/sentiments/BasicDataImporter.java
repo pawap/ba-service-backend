@@ -53,7 +53,7 @@ public class BasicDataImporter {
 
 	TweetRepository currentRepository;
 
-	int dataDestination;
+	private int dataDestination;
 
 	public BasicDataImporter() {
 		super();
@@ -67,7 +67,7 @@ public class BasicDataImporter {
 			reader.setLenient(true);
 
 			int i = 0;
-			List<Tweet> tweets = new LinkedList();
+			List<AbstractTweet> tweets = new LinkedList();
 			while (reader.hasNext()) {
 				// Read data into object model
 				try {
@@ -76,7 +76,7 @@ public class BasicDataImporter {
 					}
 					JsonElement element = gson.fromJson(reader, JsonElement.class);
 					JsonObject object = element.getAsJsonObject();
-					Tweet tweet = this.mapJsonToTweet(object);
+					AbstractTweet tweet = this.mapJsonToTweet(object);
 					if (tweet != null && tweet.getText() != null) {
 						i++;
 						if (tweetMarker != null) {
@@ -89,11 +89,11 @@ public class BasicDataImporter {
 				}
 				// persist tweets in batch (256 per insert)
 				if (i % 256 == 0) {
-					this.currentRepository.save(tweets);
+					this.currentRepository.saveAll(tweets);
 					tweets.clear();
 				}
 			}
-			this.tweetRepository.save(tweets);
+			this.tweetRepository.saveAll(tweets);
 			reader.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -110,13 +110,13 @@ public class BasicDataImporter {
 	public void importFromTsv(String tsvPath, TweetMarker tweetMarker) {
 		Reader in;
         int i = 0;
-        List<Tweet> tweets = new LinkedList();
+        List<AbstractTweet> tweets = new LinkedList();
 		try {
 			FileInputStream fstream = new FileInputStream(tsvPath);
 			in = new BufferedReader(new InputStreamReader(fstream));
 			Iterable<CSVRecord> records = CSVFormat.TDF.withHeader().parse(in);
 			for (CSVRecord record : records) {
-				Tweet tweet = this.mapTsvToTweet(record);
+				AbstractTweet tweet = this.mapTsvToTweet(record);
         		if (tweet != null && tweet.getText() != null) {
         			i++;
 					if (tweetMarker != null) {
@@ -125,7 +125,7 @@ public class BasicDataImporter {
 					tweets.add(tweet);
         		}
             	if (i % 256 == 0) {
-            		this.currentRepository.save(tweets);
+            		this.currentRepository.saveAll(tweets);
             		tweets.clear();
             	} 	
 			}
@@ -137,10 +137,10 @@ public class BasicDataImporter {
 			e.printStackTrace();
 		}
     	// persist tweets in batch (256 per insert)
-        this.tweetRepository.save(tweets);
+        this.tweetRepository.saveAll(tweets);
 	}
 
-	private Tweet mapTsvToTweet(CSVRecord record) {
+	private AbstractTweet mapTsvToTweet(CSVRecord record) {
 		Tweet tweet = new Tweet();
 		tweet.setText(record.get("tweet"));
 		switch (record.get("subtask_a")) {
@@ -155,7 +155,7 @@ public class BasicDataImporter {
 		return tweet;
 	}
 
-	private Tweet mapJsonToTweet(JsonObject object) {
+	private AbstractTweet mapJsonToTweet(JsonObject object) {
 		Tweet tweet = new Tweet();
 		if (object.has("text")) {
 			tweet.setText(object.get("text").getAsString());
@@ -194,11 +194,13 @@ public class BasicDataImporter {
 
 	private void setDataDestination(int destination) {
 
+		this.dataDestination = destination;
+
 		switch (destination) {
-		case 0:
+		case IMPORT:
 			this.currentRepository = this.tweetRepository;
 			break;
-		case 1:
+		case TRAINING:
 			this.currentRepository = this.trainingTweetRepository;
 			break;
 		}

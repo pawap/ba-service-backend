@@ -12,5 +12,14 @@ import javax.persistence.Entity;
 @Entity
 public class Tweet extends AbstractTweet {
 
-	
+    private String twitterId;
+
+    public String getTwitterId() {
+        return twitterId;
+    }
+
+    public void setTwitterId(String twitterId) {
+        this.twitterId = twitterId;
+    }
+
 }
