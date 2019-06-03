@@ -7,14 +7,19 @@
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<!--Vue.js import-->
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<!--VCalender import-->
+		<link rel='stylesheet' href='https://unpkg.com/v-calendar/lib/v-calendar.min.css'>
+		<script src='https://unpkg.com/v-calendar'></script>
+		<!--Moment.js import-->
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js'></script>
 		<!--Chart.js import-->
 		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 		<!--Axios import-->
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		<!--Twitter import-->
 		<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-		<script async src="sentiment-script.js"></script>
+		<!--Own Script-->
+		<script src="sentiment-script.js"></script>
 	</head>
 	<!--CSS Styling-->
 	<style>
@@ -23,8 +28,8 @@
 		}
 
 		.border-box{
-			border: 1px solid rgb(0, 0, 0);
-			border-radius: 3%;
+			border: 2px solid rgb(128, 128, 128);
+			border-radius: 2%;
 
 		}
 
@@ -37,14 +42,12 @@
 			color: rgb(68, 68, 68);
 			font-style: italic
 		}
-
-		.margin-buffer{
-			margin-top:20px;
-			margin-bottom: 20px;
+		input{
+			align-self: left;
 		}
 	</style>
 	<body>
-		<div class="container main" id="app">
+		<div class="container-fluid main" id="app">
 			<div class="row">
 				<div class="col-sm-12">
 					<h1>Sentiment Analysis</h1>
@@ -62,39 +65,27 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<div class="border-box">
-						<p>
-							<span class="comment">//Graph update based on selected time not implemented yet</span>
-							<br>
-							Zeitraum:
-							<select v-model="selectBarTime" @change='updateBarChartTime()'>
+					<div class="border-box chart p-2">
+							<h4>Anzahl offensive vs. non-offensive Tweets</h4>
+							<select v-model="selectPieTime" @change='updatePieChartTime()'>
 									<option disabled value="">Suche einen Zeitraum aus</option>
 									<option v-for="time in times" v-bind:value="time.value">
 											{{ time.text }}
 									</option>
 							</select>
-						</p>
-						<canvas id="barChart"></canvas>
+						<canvas id="pieChart"></canvas>
 						</div>
 				</div>
 				<div class="col-sm-6">
-					<div class="border-box">
-						<p>
-							<span class="comment">//Graph update based on selected time not implemented yet</span>
-							<br>
-							Zeitraum:
-							<select v-model="selectLineTime" @change='updateLineChartTime()'>
-									<option disabled value="">Suche einen Zeitraum aus</option>
-									<option v-for="time in times" v-bind:value="time.value">
-											{{ time.text }}
-									</option>
-							</select>	
-						</p>
+					<div class="border-box chart p-2">
+						<h4>Verlauf offensive & non-offensive Tweets</h4>
+						<v-date-picker @input="updateLineChart()" :max-date='new Date()' mode='range' v-model="selectedDate">
+						</v-date-picker>			
 						<canvas id="lineChart"></canvas>
 					</div>
 				</div>
 			</div>
-			<div class="row margin-buffer">
+			<div class="row mt-3">
 				<div class="col-sm-6">
 					<div class="border-box">
 							<p>Zufälliger als offensive eingestufter Tweet:</p>		
@@ -103,8 +94,8 @@
 				</div>
 				<div class="col-sm-6">
 						<div class="border-box">
-								<p>Zufälliger als non-offensive eingestufter Tweet:</p>
-								<div id=nonOffTweet></div>
+							<p>Zufälliger als non-offensive eingestufter Tweet:</p>
+							<div id=nonOffTweet></div>
 						</div>
 					</div>
 			</div>			
