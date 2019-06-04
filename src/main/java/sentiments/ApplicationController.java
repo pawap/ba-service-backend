@@ -35,7 +35,7 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
 	Environment env;
 	
 	@Autowired
-	BasicDataImporter basicDataImporter;
+	BasicDataImporterMongo basicDataImporter;
 
     @RequestMapping("/sentiments")
 	public ResponseEntity<String> home(@RequestParam(value = "tweet", defaultValue = "") String tweet, @RequestParam(value = "format", defaultValue = "text") String format) {
@@ -91,7 +91,9 @@ public class ApplicationController implements SentimentAnalysisWebInterface{
     
     @RequestMapping("/import")
 	public ResponseEntity<String> tweetimport() {
-    	
+
+        //mongo.BasicDataImporter bdi = new mongo.BasicDataImporter();
+        //bdi.importFromJson();
     	this.basicDataImporter.importFromJson();
     	
         HttpHeaders responseHeaders = new HttpHeaders();

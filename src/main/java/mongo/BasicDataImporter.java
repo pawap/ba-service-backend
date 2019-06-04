@@ -1,11 +1,16 @@
-package sentiments;
+package mongo;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.joestelmach.natty.DateGroup;
+import com.joestelmach.natty.Parser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+import sentiments.Tweet;
+
+import java.io.*;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -13,19 +18,6 @@ import java.time.format.DateTimeParseException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.joestelmach.natty.DateGroup;
-import com.joestelmach.natty.Parser;
 
 /**
  * @author Paw
@@ -36,16 +28,18 @@ public class BasicDataImporter {
 
 	@Autowired
 	Environment env;
-	
+
 	@Autowired
-	TweetRepository tweetRepository;
-	
+	mongo.TweetRepository tweetRepository;
+
 	public BasicDataImporter() {
 		super();
 	}
 
+
 	public void importFromJson() {
-		String jsonPath = this.env.getProperty("localTweetJson");
+		//String jsonPath = this.env.getProperty("localTweetJson");
+		String jsonPath = "C:/Users/Paddy/Desktop/tweet2018121920_17.json";
 		try {
 			InputStream stream = new FileInputStream(jsonPath);
 			JsonReader reader = new JsonReader(new InputStreamReader(stream, "UTF-8"));
@@ -53,7 +47,7 @@ public class BasicDataImporter {
 	        reader.setLenient(true);
 
 	        int i = 0;
-	        List<Tweet> tweets = new LinkedList();
+	        List<mongo.Tweet> tweets = new LinkedList();
 	        while (reader.hasNext()) {
 	            // Read data into object model
 	        	try {
@@ -62,7 +56,7 @@ public class BasicDataImporter {
 	        		}
 	        		JsonElement element = gson.fromJson(reader, JsonElement.class);
 	        		JsonObject object = element.getAsJsonObject();
-	        		Tweet tweet = this.mapJsonToTweet(object);
+	        		mongo.Tweet tweet = this.mapJsonToTweet(object);
 	        		if (tweet != null && tweet.getText() != null) {
 	        			i++;
 	        			tweets.add(tweet);
@@ -72,11 +66,11 @@ public class BasicDataImporter {
 	        	}
 	        	// persist tweets in batch (256 per insert)
 	        	if (i % 256 == 0) {
-	        		this.tweetRepository.saveAll(tweets);
+	        		tweetRepository.saveAll(tweets);
 	        		tweets.clear();
-	        	} 
+	        	}
 	        }
-	        this.tweetRepository.saveAll(tweets);
+	        tweetRepository.saveAll(tweets);
 	        reader.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -87,11 +81,11 @@ public class BasicDataImporter {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}
 	}
 
-	private Tweet mapJsonToTweet(JsonObject object) {
-		Tweet tweet = new Tweet();
+	private mongo.Tweet mapJsonToTweet(JsonObject object) {
+		mongo.Tweet tweet = new mongo.Tweet();
 		if (object.has("text")) {
 			tweet.setText(object.get("text").getAsString());
 		}

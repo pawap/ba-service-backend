@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 public class MongoDBConfig {
 
     @Bean
-    CommandLineRunner commandLineRunner(TweetRepository tweetRepository) {
+    CommandLineRunner commandLineRunner(mongo.TweetRepository tweetRepository) {
         return strings -> {
             tweetRepository.save(new Tweet(1,"ein tweet",new Timestamp(100),new Timestamp(200)));
             tweetRepository.save(new Tweet(2,"noch ein tweet",new Timestamp(200),new Timestamp(300)));

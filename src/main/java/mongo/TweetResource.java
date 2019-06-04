@@ -12,9 +12,9 @@ import java.util.List;
 public class TweetResource {
 
 
-    private TweetRepository tweetRepository;
+    private mongo.TweetRepository tweetRepository;
 
-    public TweetResource(TweetRepository tweetRepository){
+    public TweetResource(mongo.TweetRepository tweetRepository){
         this.tweetRepository = tweetRepository;
     }
 
