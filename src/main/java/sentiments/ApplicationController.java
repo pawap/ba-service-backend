@@ -43,11 +43,11 @@ import org.springframework.web.bind.annotation.*;
  * Dummy App-Controller for determining the initial project architecture
  *
  */
-@Configuration
+//@Configuration
 @RestController
 @EnableAutoConfiguration
 @ComponentScan
-public class ApplicationController extends SpringBootServletInitializer implements SentimentAnalysisWebInterface{
+public class ApplicationController implements SentimentAnalysisWebInterface{
 
 	@Autowired
 	Environment env;
@@ -157,7 +157,7 @@ public class ApplicationController extends SpringBootServletInitializer implemen
         return new ResponseEntity<String>(response, responseHeaders,HttpStatus.CREATED);
     }
     
-    @RequestMapping("/import")
+    @RequestMapping("/backend/import")
 	public ResponseEntity<String> tweetimport() {
     	
     	this.basicDataImporter.importExampleJson();
@@ -168,7 +168,7 @@ public class ApplicationController extends SpringBootServletInitializer implemen
         return new ResponseEntity<String>("finished", responseHeaders,HttpStatus.CREATED);
     }
     
-    @RequestMapping("/import/testandtrain")
+    @RequestMapping("/backend/import/testandtrain")
 	public ResponseEntity<String> testAndTrainimport() {
     	
     	this.basicDataImporter.importTsvTestAndTrain();

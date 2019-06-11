@@ -3,7 +3,6 @@ package sentiments;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,9 +11,10 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -32,34 +32,34 @@ import com.google.gson.stream.JsonToken;
 import com.joestelmach.natty.DateGroup;
 import com.joestelmach.natty.Parser;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+
 /**
  * @author Paw
  *
  */
+@Transactional
 @Service
 public class BasicDataImporter {
 
-	private static final int IMPORT = 0;
-	private static final int TRAINING = 1;
+	private static final int BATCH_SIZE = 1024;
 
 	@Autowired
 	Environment env;
 
-	@Autowired
-	TweetRepository tweetRepository;
+	@PersistenceContext
+	EntityManager entityManager;
 
-	@Autowired
-	TrainingTweetRepository trainingTweetRepository;
-
-	TweetRepository currentRepository;
-
-	private int dataDestination;
+	DateTimeFormatter dateTimeFormatter;
 
 	public BasicDataImporter() {
 		super();
+		this.dateTimeFormatter = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss Z yyyy", Locale.UK);
 	}
 
-	public void importFromJson(String jsonPath, TweetMarker tweetMarker) {
+	public void importFromJson(String jsonPath, TweetProvider tweetProvider) {
 		try {
 			InputStream stream = new FileInputStream(jsonPath);
 			JsonReader reader = new JsonReader(new InputStreamReader(stream, "UTF-8"));
@@ -67,7 +67,6 @@ public class BasicDataImporter {
 			reader.setLenient(true);
 
 			int i = 0;
-			List<AbstractTweet> tweets = new LinkedList();
 			while (reader.hasNext()) {
 				// Read data into object model
 				try {
@@ -76,24 +75,24 @@ public class BasicDataImporter {
 					}
 					JsonElement element = gson.fromJson(reader, JsonElement.class);
 					JsonObject object = element.getAsJsonObject();
-					AbstractTweet tweet = this.mapJsonToTweet(object);
+					AbstractTweet tweet = tweetProvider.createTweet();
+					this.mapJsonToTweet(object, tweet);
 					if (tweet != null && tweet.getText() != null) {
 						i++;
-						if (tweetMarker != null) {
-							tweetMarker.mark(tweet);
-						}
-						tweets.add(tweet);
+						entityManager.persist(tweet);
 					}
+					System.out.println(i);
 				} catch (IllegalStateException | JsonSyntaxException e) {
 					reader.skipValue();
 				}
-				// persist tweets in batch (256 per insert)
-				if (i % 256 == 0) {
-					this.currentRepository.saveAll(tweets);
-					tweets.clear();
+				// persist tweets in batch
+				if (i % BATCH_SIZE == 0) {
+					entityManager.flush();
+					entityManager.clear();
 				}
 			}
-			this.tweetRepository.saveAll(tweets);
+			entityManager.flush();
+			entityManager.clear();
 			reader.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -107,27 +106,25 @@ public class BasicDataImporter {
 		}
 	}
 
-	public void importFromTsv(String tsvPath, TweetMarker tweetMarker) {
+	public void importFromTsv(String tsvPath, TweetProvider tweetProvider) {
 		Reader in;
         int i = 0;
-        List<AbstractTweet> tweets = new LinkedList();
 		try {
 			FileInputStream fstream = new FileInputStream(tsvPath);
 			in = new BufferedReader(new InputStreamReader(fstream));
 			Iterable<CSVRecord> records = CSVFormat.TDF.withHeader().parse(in);
 			for (CSVRecord record : records) {
-				AbstractTweet tweet = this.mapTsvToTweet(record);
+				AbstractTweet tweet = tweetProvider.createTweet();
+				this.mapTsvToTweet(record, tweet);
         		if (tweet != null && tweet.getText() != null) {
         			i++;
-					if (tweetMarker != null) {
-						tweetMarker.mark(tweet);
-					}
-					tweets.add(tweet);
+					entityManager.persist(tweet);
         		}
-            	if (i % 256 == 0) {
-            		this.currentRepository.saveAll(tweets);
-            		tweets.clear();
-            	} 	
+				System.out.println(i);
+				if (i % BATCH_SIZE == 0) {
+            		entityManager.flush();
+					entityManager.clear();
+            	}
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -137,11 +134,11 @@ public class BasicDataImporter {
 			e.printStackTrace();
 		}
     	// persist tweets in batch (256 per insert)
-        this.tweetRepository.saveAll(tweets);
+		entityManager.flush();
+		entityManager.clear();
 	}
 
-	private AbstractTweet mapTsvToTweet(CSVRecord record) {
-		Tweet tweet = new Tweet();
+	private void mapTsvToTweet(CSVRecord record, AbstractTweet tweet) {
 		tweet.setText(record.get("tweet"));
 		switch (record.get("subtask_a")) {
 		case "OFF":
@@ -152,18 +149,16 @@ public class BasicDataImporter {
 			break;
 		default:
 		}
-		return tweet;
 	}
 
-	private AbstractTweet mapJsonToTweet(JsonObject object) {
-		Tweet tweet = new Tweet();
+	private void mapJsonToTweet(JsonObject object, AbstractTweet tweet) {
 		if (object.has("text")) {
 			tweet.setText(object.get("text").getAsString());
 		}
 		if (object.has("created_at")) {
 			LocalDateTime dateTime;
 			try {
-				dateTime = LocalDateTime.parse(object.get("created_at").getAsString());
+				dateTime = LocalDateTime.parse(object.get("created_at").getAsString(), this.dateTimeFormatter);
 				tweet.setCrdate(Timestamp.valueOf(dateTime));
 			} catch (DateTimeParseException | NullPointerException e) {
 				Parser parser = new Parser();
@@ -175,35 +170,20 @@ public class BasicDataImporter {
 			}
 		}
 		tweet.setTmstamp(Timestamp.valueOf(LocalDateTime.now()));
-		return tweet;
 	}
 
 	public void importExampleJson() {
-		setDataDestination(IMPORT);
 		String jsonPath = this.env.getProperty("localTweetJson");
-		importFromJson(jsonPath, null);
+		importFromJson(jsonPath, () -> new Tweet());
 	}
 
 	public void importTsvTestAndTrain() {
-		setDataDestination(IMPORT);
-		importFromTsv(this.env.getProperty("localTweetTsv.train"), null);
-		importFromTsv(this.env.getProperty("localTweetTsv.test"), tweet -> {
-			//((TrainingTweet) tweet).setTest(true);
+		importFromTsv(this.env.getProperty("localTweetTsv.train"), () -> new TrainingTweet());
+		importFromTsv(this.env.getProperty("localTweetTsv.test"), () -> {
+			TrainingTweet tweet = new TrainingTweet();
+			tweet.setTest(true);
+			return tweet;
 		});
 	}
 
-	private void setDataDestination(int destination) {
-
-		this.dataDestination = destination;
-
-		switch (destination) {
-		case IMPORT:
-			this.currentRepository = this.tweetRepository;
-			break;
-		case TRAINING:
-			this.currentRepository = this.trainingTweetRepository;
-			break;
-		}
-
-	}
 }
