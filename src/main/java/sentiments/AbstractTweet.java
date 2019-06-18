@@ -7,20 +7,33 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.sql.Timestamp;
+
+@Document
 @MappedSuperclass
 public class AbstractTweet {
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	//@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	private Integer uid;
-	@Lob
 	private String text;
 	private Timestamp crdate;
 	private Timestamp tmstamp;
 	private boolean offensive;
 
 	public AbstractTweet() {
+	}
+	public AbstractTweet(Integer uid, String text, Timestamp crdate, Timestamp tmstamp){
+		this.uid = uid;
+		this.text =text;
+		this.crdate = crdate;
+		this.tmstamp = tmstamp;
 	}
 
 	public Integer getUid() {
